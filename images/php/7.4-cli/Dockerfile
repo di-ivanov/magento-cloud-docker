@@ -67,15 +67,15 @@ RUN pip3 install --upgrade setuptools \
 RUN npm install -g grunt-cli
 
 # Install MailHog
-RUN curl -L -O https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 \
-    && sudo chmod +x mhsendmail_linux_amd64 \
-    && sudo mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
+RUN curl -L -O https://github.com/evertiro/mhsendmail/releases/download/v0.2.0-M1/mhsendmail_linux_arm64 \
+    && sudo chmod +x mhsendmail_linux_arm64 \
+    && sudo mv mhsendmail_linux_arm64 /usr/local/bin/mhsendmail
 
 # Configure the gd library
 RUN docker-php-ext-configure \
   gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 RUN docker-php-ext-configure \
-  ldap --with-libdir=lib/x86_64-linux-gnu
+  ldap --with-libdir=lib/aarch64-linux-gnu
 RUN docker-php-ext-configure \
   opcache --enable-opcache
 
@@ -121,7 +121,7 @@ RUN pecl install -o -f \
   xdebug-3.0.4 \
   yaml
 
-RUN curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
+RUN curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/arm64/$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
   && mkdir -p /tmp/blackfire \
   && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
   && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
@@ -157,13 +157,13 @@ RUN rm -f /usr/local/etc/php/conf.d/*sodium.ini \
   && rm -rf /tmp/libsodium \
   && pecl install -o -f libsodium
 RUN cd /tmp \
-  && curl -O https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
-  && tar zxvf ioncube_loaders_lin_x86-64.tar.gz \
+  && curl -O https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_aarch64.tar.gz \
+  && tar zxvf ioncube_loaders_lin_aarch64.tar.gz \
   && export PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;") \
   && export PHP_EXT_DIR=$(php-config --extension-dir) \
   && cp "./ioncube/ioncube_loader_lin_${PHP_VERSION}.so" "${PHP_EXT_DIR}/ioncube.so" \
   && rm -rf ./ioncube \
-  && rm ioncube_loaders_lin_x86-64.tar.gz
+  && rm ioncube_loaders_lin_aarch64.tar.gz
 
 ADD etc/php-cli.ini /usr/local/etc/php/conf.d/zz-magento.ini
 ADD etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini
